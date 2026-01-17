@@ -6,9 +6,17 @@ import type {
   SequenceSummary,
   SequenceDetail,
   AircraftStateAtTimestamp,
+  AircraftTrajectory,
+  TrajectoryPoint,
 } from "./db/queries";
 
-export type { SequenceSummary, SequenceDetail, AircraftStateAtTimestamp };
+export type {
+  SequenceSummary,
+  SequenceDetail,
+  AircraftStateAtTimestamp,
+  AircraftTrajectory,
+  TrajectoryPoint,
+};
 
 export interface SequencesResponse {
   airport: string;
@@ -24,13 +32,19 @@ export interface StatesResponse {
   aircraft: AircraftStateAtTimestamp[];
 }
 
+export interface TrajectoriesResponse {
+  sequenceId: string;
+  trajectories: AircraftTrajectory[];
+}
+
 export interface ApiError {
   error: "VALIDATION_ERROR" | "NOT_FOUND" | "SERVER_ERROR";
   message: string;
   details?: unknown;
 }
 
-const API_BASE = "/api";
+// Use absolute URL for both client and server
+const API_BASE = "http://localhost:3000/api";
 
 /**
  * Generic fetcher for SWR

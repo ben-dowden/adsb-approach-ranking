@@ -10,10 +10,11 @@ import { useEffect, useMemo } from "react";
 
 import { useReplayState } from "@/hooks/useReplayState";
 import { useSequenceStates } from "@/hooks/useSequenceStates";
+import { useSequenceTrajectories } from "@/hooks/useSequenceTrajectories";
 import { getAirportCoordinates } from "@/lib/airports";
 import type { SequenceDetail } from "@/lib/api";
 
-import { ArrivalPanel } from "./ArrivalPanel";
+import { TabPanel } from "./TabPanel";
 import { TimeScrubber } from "./TimeScrubber";
 
 // Dynamic import for ApproachMap to avoid SSR issues with Leaflet
@@ -88,6 +89,31 @@ const styles = {
     borderRadius: "8px",
     textAlign: "center" as const,
   },
+  emptyState: {
+    position: "absolute" as const,
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    padding: "24px",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: "8px",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+    textAlign: "center" as const,
+    zIndex: 1000,
+    maxWidth: "400px",
+  },
+  emptyStateTitle: {
+    margin: "0 0 8px 0",
+    fontSize: "16px",
+    fontWeight: 600,
+    color: "#374151",
+  },
+  emptyStateText: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#6b7280",
+    lineHeight: 1.5,
+  },
   loading: {
     display: "flex",
     alignItems: "center",
@@ -142,12 +168,23 @@ export function ReplayView({ sequence }: ReplayViewProps) {
     updatePreviousStates,
   } = replayState;
 
-  const { data } = useSequenceStates(
+  const { data, isLoading: isLoadingStates } = useSequenceStates(
     sequence.sequenceId,
     currentTs.toISOString()
   );
+  const { data: trajectoriesData, isLoading: isLoadingTrajectories } = useSequenceTrajectories(sequence.sequenceId);
 
   const aircraft = data?.aircraft ?? [];
+  const trajectories = trajectoriesData?.trajectories ?? [];
+  const isLoading = isLoadingStates || isLoadingTrajectories;
+  const hasNoData = !isLoading && aircraft.length === 0 && trajectories.length === 0;
+
+  // Compute current distance from selected aircraft
+  const currentDistanceNm = useMemo(() => {
+    if (!selectedAircraft) return null;
+    const selected = aircraft.find((ac) => ac.icao === selectedAircraft);
+    return selected ? selected.distanceNm : null;
+  }, [aircraft, selectedAircraft]);
 
   // Update previous states when we get new data
   useEffect(() => {
@@ -193,7 +230,7 @@ export function ReplayView({ sequence }: ReplayViewProps) {
 
       <div style={styles.main}>
         <div style={styles.mapContainer}>
-          <div style={styles.map}>
+          <div style={{ ...styles.map, position: "relative" as const }}>
             <ApproachMap
               centerLat={airport.lat}
               centerLon={airport.lon}
@@ -202,6 +239,16 @@ export function ReplayView({ sequence }: ReplayViewProps) {
               previousStates={previousStates}
               onSelectAircraft={selectAircraft}
             />
+            {hasNoData && (
+              <div style={styles.emptyState}>
+                <h3 style={styles.emptyStateTitle}>No aircraft data available</h3>
+                <p style={styles.emptyStateText}>
+                  The database may be missing aircraft states or arrival ranks.
+                  Ensure all pipeline stages (normalize, derive, score, sequence)
+                  have completed successfully.
+                </p>
+              </div>
+            )}
           </div>
           <TimeScrubber
             currentTs={currentTs}
@@ -216,10 +263,12 @@ export function ReplayView({ sequence }: ReplayViewProps) {
         </div>
 
         <div style={styles.panel}>
-          <ArrivalPanel
+          <TabPanel
             aircraft={aircraft}
+            trajectories={trajectories}
             selectedAircraft={selectedAircraft}
             previousStates={previousStates}
+            currentDistanceNm={currentDistanceNm}
             onSelectAircraft={selectAircraft}
           />
         </div>

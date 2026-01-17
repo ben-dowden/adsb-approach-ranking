@@ -1,14 +1,13 @@
 /**
- * GET /api/sequences/:id/states - Get aircraft positions at timestamp
+ * GET /api/sequences/:id/trajectories - Get rank trajectories for all aircraft
  */
 
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 import { cache, CACHE_TTL } from "@/lib/cache";
-import { getSequenceStatesAtTimestamp } from "@/lib/db/queries";
-import { sequenceParamsSchema, statesQuerySchema } from "@/lib/validation";
+import { getSequenceTrajectories } from "@/lib/db/queries";
+import { sequenceParamsSchema } from "@/lib/validation";
 
 interface ApiError {
   error: "VALIDATION_ERROR" | "NOT_FOUND" | "SERVER_ERROR";
@@ -21,41 +20,34 @@ interface RouteParams {
 }
 
 export async function GET(
-  request: NextRequest,
+  _request: Request,
   { params }: RouteParams
 ): Promise<NextResponse> {
   try {
     const { id } = await params;
-    const searchParams = request.nextUrl.searchParams;
 
-    // Validate params and query
+    // Validate params
     sequenceParamsSchema.parse({ id });
-    const { ts } = statesQuerySchema.parse({
-      ts: searchParams.get("ts"),
-    });
 
-    // Use timestamp truncated to seconds for cache key
-    const tsDate = new Date(ts);
-    const tsSec = Math.floor(tsDate.getTime() / 1000);
-    const cacheKey = `states:${id}:${tsSec}`;
+    const cacheKey = `trajectories:${id}`;
 
     // Check cache
     const cached = cache.get(cacheKey);
     if (cached) {
       return NextResponse.json(cached, {
         headers: {
-          "Cache-Control": "public, max-age=60, immutable",
+          "Cache-Control": "public, max-age=300, immutable",
           "X-Cache": "HIT",
         },
       });
     }
 
     // Query database
-    console.log(`[states] Querying for sequence ${id} at ${ts}`);
-    const states = await getSequenceStatesAtTimestamp(id, ts);
-    console.log(`[states] Returned ${states?.length ?? 0} aircraft`);
+    console.log(`[trajectories] Querying for sequence ${id}`);
+    const trajectories = await getSequenceTrajectories(id);
+    console.log(`[trajectories] Returned ${trajectories?.length ?? 0} trajectories`);
 
-    if (states === null) {
+    if (trajectories === null) {
       const apiError: ApiError = {
         error: "NOT_FOUND",
         message: `Sequence not found: ${id}`,
@@ -65,17 +57,15 @@ export async function GET(
 
     const response = {
       sequenceId: id,
-      timestamp: ts,
-      aircraftCount: states.length,
-      aircraft: states,
+      trajectories,
     };
 
     // Store in cache
-    cache.set(cacheKey, response, CACHE_TTL.STATES);
+    cache.set(cacheKey, response, CACHE_TTL.TRAJECTORIES);
 
     return NextResponse.json(response, {
       headers: {
-        "Cache-Control": "public, max-age=60, immutable",
+        "Cache-Control": "public, max-age=300, immutable",
         "X-Cache": "MISS",
       },
     });
@@ -89,7 +79,7 @@ export async function GET(
       return NextResponse.json(apiError, { status: 400 });
     }
 
-    console.error("Error fetching states:", error);
+    console.error("Error fetching trajectories:", error);
     const apiError: ApiError = {
       error: "SERVER_ERROR",
       message: "Internal server error",

@@ -14,22 +14,6 @@ const styles = {
     flexDirection: "column" as const,
     backgroundColor: "#fff",
   },
-  header: {
-    padding: "16px",
-    borderBottom: "1px solid #e5e7eb",
-    backgroundColor: "#f9fafb",
-  },
-  title: {
-    margin: 0,
-    fontSize: "16px",
-    fontWeight: 600,
-    color: "#111827",
-  },
-  subtitle: {
-    margin: "4px 0 0",
-    fontSize: "12px",
-    color: "#6b7280",
-  },
   list: {
     flex: 1,
     overflowY: "auto" as const,
@@ -120,12 +104,6 @@ export function ArrivalPanel({
 
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={styles.title}>Arrivals</h2>
-        <p style={styles.subtitle}>
-          {aircraft.length} aircraft in approach sequence
-        </p>
-      </div>
       <div style={styles.list}>
         {sorted.length === 0 ? (
           <div style={styles.emptyState}>No aircraft in view</div>

@@ -14,6 +14,7 @@ export const CACHE_TTL = {
   SEQUENCES: 5 * 60 * 1000, // 5 minutes
   SEQUENCE: 5 * 60 * 1000, // 5 minutes
   STATES: 1 * 60 * 1000, // 1 minute
+  TRAJECTORIES: 5 * 60 * 1000, // 5 minutes (static data)
 } as const;
 
 class LRUCache<T> {

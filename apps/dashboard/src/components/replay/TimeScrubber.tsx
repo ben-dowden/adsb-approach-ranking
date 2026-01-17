@@ -52,7 +52,9 @@ const styles = {
   },
   speedButton: {
     padding: "4px 8px",
-    border: "1px solid #d1d5db",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#d1d5db",
     borderRadius: "4px",
     backgroundColor: "#fff",
     fontSize: "12px",

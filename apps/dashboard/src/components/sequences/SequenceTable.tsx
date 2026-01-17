@@ -89,7 +89,7 @@ export function SequenceTable({ sequences }: SequenceTableProps) {
           <tr
             key={seq.sequenceId}
             style={styles.tr}
-            onClick={() => router.push(`/sequence/${seq.sequenceId}`)}
+            onClick={() => router.push(`/sequences/${seq.sequenceId}`)}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#f3f4f6";
             }}
