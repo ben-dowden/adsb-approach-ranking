@@ -39,6 +39,7 @@ export async function loadTracks(
       alt_baro,
       gs,
       track,
+      vrt,
       distance_nm
     FROM aircraft_states
     WHERE airport_icao = '${airportIcao}'
@@ -62,7 +63,8 @@ export async function loadTracks(
       const altBaro = row[5] as number | null;
       const gs = row[6] as number | null;
       const track = row[7] as number | null;
-      const distanceNm = Number(row[8]);
+      const vrt = row[8] as number | null;
+      const distanceNm = Number(row[9]);
 
       const state: TrackState = {
         ts,
@@ -73,6 +75,7 @@ export async function loadTracks(
         altBaro: altBaro !== null ? Number(altBaro) : null,
         gs: gs !== null ? Number(gs) : null,
         track: track !== null ? Number(track) : null,
+        vrt: vrt !== null ? Number(vrt) : null,
         distanceNm,
       };
 

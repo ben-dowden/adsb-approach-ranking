@@ -19,6 +19,7 @@ export interface TrackState {
   altBaro: number | null;
   gs: number | null;
   track: number | null;
+  vrt: number | null;
   distanceNm: number;
 }
 

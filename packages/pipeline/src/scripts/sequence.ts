@@ -17,9 +17,11 @@ import {
   DEFAULT_WINDOW_SIZE_MIN,
   DEFAULT_WINDOW_STEP_MIN,
   MIN_WINDOW_COHORT_SIZE,
+  MIN_RINGS_PER_ARRIVAL,
   initSequenceDatabase,
   hasArrivalRanksData,
   loadArrivalRanks,
+  filterByMinRings,
   insertArrivalSequences,
   exportSequencesToParquet,
   getArrivalSequenceCount,
@@ -95,6 +97,7 @@ async function main() {
   console.log(`[sequence] Window size: ${DEFAULT_WINDOW_SIZE_MIN} minutes`);
   console.log(`[sequence] Window step: ${DEFAULT_WINDOW_STEP_MIN} minutes`);
   console.log(`[sequence] Min aircraft per window: ${MIN_WINDOW_COHORT_SIZE}`);
+  console.log(`[sequence] Min rings per arrival: ${MIN_RINGS_PER_ARRIVAL}`);
 
   // Initialize database
   const dbPath = join(process.cwd(), "data", "db", "adsb.duckdb");
@@ -126,11 +129,22 @@ async function main() {
 
   // Load arrival ranks
   console.log("[sequence] Loading arrival ranks...");
-  const ranks = await loadArrivalRanks(connection, args.airport, args.date);
-  console.log(`[sequence] Loaded ${ranks.length} arrival rank records`);
+  const allRanks = await loadArrivalRanks(connection, args.airport, args.date);
+  console.log(`[sequence] Loaded ${allRanks.length} arrival rank records`);
+
+  if (allRanks.length === 0) {
+    console.warn("[sequence] No arrival ranks found - nothing to process");
+    closeSequenceDatabase(db);
+    process.exit(0);
+  }
+
+  // Filter to only include arrivals with sufficient ring crossings
+  console.log("[sequence] Filtering arrivals by minimum ring crossings...");
+  const ranks = filterByMinRings(allRanks);
+  console.log(`[sequence] Retained ${ranks.length} rank records after filtering`);
 
   if (ranks.length === 0) {
-    console.warn("[sequence] No arrival ranks found - nothing to process");
+    console.warn("[sequence] No arrivals with sufficient ring crossings - nothing to process");
     closeSequenceDatabase(db);
     process.exit(0);
   }

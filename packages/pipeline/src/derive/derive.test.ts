@@ -22,6 +22,7 @@ interface FixtureState {
   altBaro: number | null;
   gs: number | null;
   track: number | null;
+  vrt?: number | null;
   distanceNm: number;
 }
 
@@ -50,8 +51,23 @@ function fixtureToTrack(fixture: FixtureTrack): Track {
       altBaro: s.altBaro,
       gs: s.gs,
       track: s.track,
+      vrt: s.vrt ?? -500, // Default to descending for test fixtures
       distanceNm: s.distanceNm,
     })),
+  };
+}
+
+/** Helper to create a TrackState with defaults */
+function makeState(partial: Partial<TrackState> & Pick<TrackState, "ts" | "icao" | "distanceNm">): TrackState {
+  return {
+    callsign: null,
+    lat: -27.5,
+    lon: 153.0,
+    altBaro: 5000,
+    gs: 250,
+    track: 180,
+    vrt: -500, // Default to descending
+    ...partial,
   };
 }
 
@@ -85,6 +101,7 @@ describe("interpolateCrossing", () => {
       altBaro: 10000,
       gs: 280,
       track: 270,
+      vrt: -500,
       distanceNm: 25,
     };
 
@@ -97,6 +114,7 @@ describe("interpolateCrossing", () => {
       altBaro: 9000,
       gs: 270,
       track: 270,
+      vrt: -500,
       distanceNm: 15,
     };
 
@@ -121,6 +139,7 @@ describe("interpolateCrossing", () => {
       altBaro: 10000,
       gs: 280,
       track: 270,
+      vrt: -500,
       distanceNm: 30,
     };
 
@@ -133,6 +152,7 @@ describe("interpolateCrossing", () => {
       altBaro: 9000,
       gs: 270,
       track: 270,
+      vrt: -500,
       distanceNm: 10,
     };
 
@@ -153,6 +173,7 @@ describe("interpolateCrossing", () => {
       altBaro: 10000,
       gs: 280,
       track: 270,
+      vrt: -500,
       distanceNm: 30,
     };
 
@@ -165,6 +186,7 @@ describe("interpolateCrossing", () => {
       altBaro: 9000,
       gs: 270,
       track: 270,
+      vrt: -500,
       distanceNm: 25,
     };
 
@@ -253,6 +275,7 @@ describe("detectCrossings gap handling", () => {
           altBaro: 10000,
           gs: 280,
           track: 270,
+          vrt: -500,
           distanceNm: 25,
         },
         // 60 second gap (> 30s threshold)
@@ -265,6 +288,7 @@ describe("detectCrossings gap handling", () => {
           altBaro: 9000,
           gs: 270,
           track: 270,
+          vrt: -500,
           distanceNm: 15,
         },
       ],
@@ -289,6 +313,7 @@ describe("detectCrossings gap handling", () => {
           altBaro: 10000,
           gs: 280,
           track: 270,
+          vrt: -500,
           distanceNm: 25,
         },
         // 30 second gap (= threshold)
@@ -301,6 +326,7 @@ describe("detectCrossings gap handling", () => {
           altBaro: 9000,
           gs: 270,
           track: 270,
+          vrt: -500,
           distanceNm: 15,
         },
       ],
@@ -374,6 +400,7 @@ describe("edge cases", () => {
           altBaro: 10000,
           gs: 280,
           track: 270,
+          vrt: -500,
           distanceNm: 25,
         },
       ],
@@ -396,6 +423,7 @@ describe("edge cases", () => {
           altBaro: 10000,
           gs: 280,
           track: 270,
+          vrt: -500,
           distanceNm: 55,
         },
         {
@@ -407,6 +435,7 @@ describe("edge cases", () => {
           altBaro: 9900,
           gs: 278,
           track: 270,
+          vrt: -500,
           distanceNm: 52,
         },
       ],
@@ -429,6 +458,7 @@ describe("edge cases", () => {
           altBaro: 5000,
           gs: 280,
           track: 90,
+          vrt: -500,
           distanceNm: 5,
         },
         {
@@ -440,6 +470,7 @@ describe("edge cases", () => {
           altBaro: 6000,
           gs: 300,
           track: 90,
+          vrt: -500,
           distanceNm: 15,
         },
         {
@@ -451,6 +482,7 @@ describe("edge cases", () => {
           altBaro: 7000,
           gs: 320,
           track: 90,
+          vrt: -500,
           distanceNm: 25,
         },
       ],

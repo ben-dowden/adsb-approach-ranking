@@ -2,7 +2,7 @@
  * Ring crossing detection logic
  */
 
-import type { Track, InterpolatedCrossing } from "./types.js";
+import type { Track, TrackState, InterpolatedCrossing } from "./types.js";
 import { DEFAULT_GAP_THRESHOLD_SEC } from "./types.js";
 import { interpolateCrossing } from "./interpolate.js";
 
@@ -19,6 +19,31 @@ export function isInwardCrossing(
   ringNm: number
 ): boolean {
   return prevDistance > ringNm && currDistance <= ringNm;
+}
+
+/**
+ * Check if aircraft is descending during a transition
+ * Uses vrt (vertical rate) if available, otherwise computes from altitude change
+ * @param prev Previous state
+ * @param curr Current state
+ * @returns true if aircraft is descending (or descent cannot be determined)
+ */
+export function isDescending(prev: TrackState, curr: TrackState): boolean {
+  // Check vrt (vertical rate) - negative means descending
+  if (curr.vrt !== null && curr.vrt < 0) {
+    return true;
+  }
+  if (prev.vrt !== null && prev.vrt < 0) {
+    return true;
+  }
+
+  // Fallback: compute from altitude change
+  if (prev.altBaro !== null && curr.altBaro !== null) {
+    return curr.altBaro < prev.altBaro;
+  }
+
+  // Cannot determine - allow the crossing (be permissive)
+  return true;
 }
 
 /**
@@ -68,8 +93,8 @@ export function detectCrossings(
         continue;
       }
 
-      // Check for inward crossing
-      if (isInwardCrossing(prev.distanceNm, curr.distanceNm, ring)) {
+      // Check for inward crossing with descent
+      if (isInwardCrossing(prev.distanceNm, curr.distanceNm, ring) && isDescending(prev, curr)) {
         const crossing = interpolateCrossing(prev, curr, ring);
         results.push(crossing);
         crossedRings.add(ring);

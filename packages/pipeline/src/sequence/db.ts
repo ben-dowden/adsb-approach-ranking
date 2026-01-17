@@ -7,6 +7,7 @@ import type { DuckDBConnection, DuckDBTimestampValue } from "@duckdb/node-api";
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { ArrivalSequence, ArrivalRankRow } from "./types.js";
+import { MIN_RINGS_PER_ARRIVAL } from "./types.js";
 
 export type SequenceDatabase = Awaited<ReturnType<typeof initSequenceDatabase>>;
 
@@ -116,6 +117,46 @@ export async function loadArrivalRanks(
   }
 
   return ranks;
+}
+
+/**
+ * Filter arrival ranks to only include arrivals with minimum ring crossings
+ * This filters out aircraft that are just passing through (not actually landing)
+ *
+ * @param ranks All arrival rank rows
+ * @param minRings Minimum number of ring crossings required (default from config)
+ * @returns Filtered ranks containing only arrivals with >= minRings crossings
+ */
+export function filterByMinRings(
+  ranks: ArrivalRankRow[],
+  minRings: number = MIN_RINGS_PER_ARRIVAL
+): ArrivalRankRow[] {
+  // Count rings per arrival
+  const ringCountByArrival = new Map<string, number>();
+  for (const rank of ranks) {
+    const count = ringCountByArrival.get(rank.arrivalId) ?? 0;
+    ringCountByArrival.set(rank.arrivalId, count + 1);
+  }
+
+  // Find arrivals with enough rings
+  const validArrivalIds = new Set<string>();
+  for (const [arrivalId, count] of ringCountByArrival) {
+    if (count >= minRings) {
+      validArrivalIds.add(arrivalId);
+    }
+  }
+
+  // Filter ranks
+  const filtered = ranks.filter((r) => validArrivalIds.has(r.arrivalId));
+
+  const removedCount = ringCountByArrival.size - validArrivalIds.size;
+  if (removedCount > 0) {
+    console.log(
+      `[filterByMinRings] Filtered out ${removedCount} arrivals with < ${minRings} ring crossings`
+    );
+  }
+
+  return filtered;
 }
 
 /**

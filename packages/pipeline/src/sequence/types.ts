@@ -56,3 +56,6 @@ export const INNER_RING_THRESHOLD_NM = 15;
 
 /** Minimum number of unique aircraft required for a valid window */
 export const MIN_WINDOW_COHORT_SIZE = 3;
+
+/** Minimum number of ring crossings required for a valid arrival */
+export const MIN_RINGS_PER_ARRIVAL = 5;
