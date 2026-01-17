@@ -52,7 +52,7 @@ export async function precomputeTrafficCounts(
   // For each ring, count distinct aircraft within that distance at each time bucket
   // This query counts how many unique aircraft were inside each ring at each time bucket
   for (const ringNm of rings) {
-    const reader = await connection.runAndReadAll(`
+    const result = await connection.run(`
       SELECT
         CAST(FLOOR(EPOCH(ts) / ${bucketSizeSec}) * ${bucketSizeSec} AS INTEGER) as ts_bucket,
         COUNT(DISTINCT icao) as aircraft_count
@@ -64,11 +64,17 @@ export async function precomputeTrafficCounts(
       ORDER BY ts_bucket
     `);
 
-    for (let i = 0; i < reader.currentRowCount; i++) {
-      const tsBucket = Number(reader.value(i, 0));
-      const count = Number(reader.value(i, 1));
-      const key = makeCacheKey(tsBucket, ringNm);
-      cache.set(key, count);
+    // Use chunk-based iteration for reliable reading
+    while (true) {
+      const chunk = await result.fetchChunk();
+      if (chunk.rowCount === 0) break;
+      const rows = chunk.getRows();
+      for (const row of rows) {
+        const tsBucket = Number(row[0]);
+        const count = Number(row[1]);
+        const key = makeCacheKey(tsBucket, ringNm);
+        cache.set(key, count);
+      }
     }
   }
 

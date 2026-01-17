@@ -77,6 +77,37 @@ Records of aircraft crossing distance ring boundaries inbound to the aerodrome.
 
 ---
 
+## arrival_ranks
+
+Detailed rank trajectory for each aircraft at each ring crossing.
+
+**Path**: `processed/{date}/arrival_ranks.parquet`
+
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `arrival_id` | string | No | Unique identifier for this arrival segment |
+| `airport_icao` | string | No | Target aerodrome ICAO code |
+| `icao_hex` | string | No | ICAO 24-bit transponder address (hex) |
+| `ring_nm` | int16 | No | Ring distance crossed (e.g., 50, 40, 30, ...) |
+| `cross_ts_utc` | timestamp[us, UTC] | No | Timestamp of ring crossing |
+| `rank_distance` | int16 | No | Dense rank within cohort by distance (1=closest) |
+| `rank_ttg` | int16 | No | Dense rank within cohort by time-to-go (1=soonest) |
+| `delta_rank_distance` | int16 | Yes | Change from previous ring (null for outermost) |
+| `delta_rank_ttg` | int16 | Yes | Change from previous ring (null for outermost) |
+| `cohort_size` | int16 | No | Number of aircraft in cohort at this ring |
+| `ring_order_index` | int16 | No | Order of ring crossings (0=outermost crossed) |
+
+**Primary Key**: (`arrival_id`, `ring_nm`)
+
+**Notes**:
+- Dense ranking: 1, 2, 3... with no gaps (ties broken by ICAO hex alphabetically)
+- `delta_rank_distance > 0` means aircraft fell back in the queue
+- `delta_rank_distance < 0` means aircraft moved forward in the queue
+- Cohorts require minimum 2 aircraft; single-aircraft crossings not ranked
+- `ring_order_index` tracks progression (0=first ring crossed, 1=second, etc.)
+
+---
+
 ## sequences
 
 Scored arrival sequences showing rank evolution across rings.
@@ -131,6 +162,7 @@ A sequence is formed when:
 
 ```
 aircraft_states ──[1:N]──▶ ring_events (via icao)
+ring_events ──[1:1]──▶ arrival_ranks (via arrival_id, ring_nm)
 ring_events ──[N:1]──▶ sequences (via sequence membership)
 ```
 

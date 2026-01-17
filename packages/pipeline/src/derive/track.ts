@@ -11,7 +11,11 @@ import type { Track, TrackState } from "./types.js";
 function timestampToDate(value: DuckDBTimestampValue): Date {
   // DuckDB timestamps are in microseconds
   const micros = value.micros;
-  return new Date(Number(micros / 1000n));
+  // Handle both BigInt and number types
+  if (typeof micros === "bigint") {
+    return new Date(Number(micros / 1000n));
+  }
+  return new Date(Number(micros) / 1000);
 }
 
 /**
@@ -25,7 +29,7 @@ export async function loadTracks(
 ): Promise<Map<string, Track>> {
   const tracks = new Map<string, Track>();
 
-  const reader = await connection.runAndReadAll(`
+  const result = await connection.run(`
     SELECT
       ts,
       icao,
@@ -42,36 +46,43 @@ export async function loadTracks(
     ORDER BY icao, ts
   `);
 
-  for (let i = 0; i < reader.currentRowCount; i++) {
-    const tsValue = reader.value(i, 0) as DuckDBTimestampValue;
-    const ts = timestampToDate(tsValue);
-    const icao = reader.value(i, 1) as string;
-    const callsign = reader.value(i, 2) as string | null;
-    const lat = Number(reader.value(i, 3));
-    const lon = Number(reader.value(i, 4));
-    const altBaro = reader.value(i, 5) as number | null;
-    const gs = reader.value(i, 6) as number | null;
-    const track = reader.value(i, 7) as number | null;
-    const distanceNm = Number(reader.value(i, 8));
+  // Use chunk-based iteration for reliable reading
+  while (true) {
+    const chunk = await result.fetchChunk();
+    if (chunk.rowCount === 0) break;
 
-    const state: TrackState = {
-      ts,
-      icao,
-      callsign,
-      lat,
-      lon,
-      altBaro: altBaro !== null ? Number(altBaro) : null,
-      gs: gs !== null ? Number(gs) : null,
-      track: track !== null ? Number(track) : null,
-      distanceNm,
-    };
+    const rows = chunk.getRows();
+    for (const row of rows) {
+      const tsValue = row[0] as DuckDBTimestampValue;
+      const ts = timestampToDate(tsValue);
+      const icao = row[1] as string;
+      const callsign = row[2] as string | null;
+      const lat = Number(row[3]);
+      const lon = Number(row[4]);
+      const altBaro = row[5] as number | null;
+      const gs = row[6] as number | null;
+      const track = row[7] as number | null;
+      const distanceNm = Number(row[8]);
 
-    let existingTrack = tracks.get(icao);
-    if (!existingTrack) {
-      existingTrack = { icao, states: [] };
-      tracks.set(icao, existingTrack);
+      const state: TrackState = {
+        ts,
+        icao,
+        callsign,
+        lat,
+        lon,
+        altBaro: altBaro !== null ? Number(altBaro) : null,
+        gs: gs !== null ? Number(gs) : null,
+        track: track !== null ? Number(track) : null,
+        distanceNm,
+      };
+
+      let existingTrack = tracks.get(icao);
+      if (!existingTrack) {
+        existingTrack = { icao, states: [] };
+        tracks.set(icao, existingTrack);
+      }
+      existingTrack.states.push(state);
     }
-    existingTrack.states.push(state);
   }
 
   return tracks;
@@ -83,13 +94,18 @@ export async function loadTracks(
 export async function listAvailableAirports(
   connection: DuckDBConnection
 ): Promise<string[]> {
-  const reader = await connection.runAndReadAll(`
+  const result = await connection.run(`
     SELECT DISTINCT airport_icao FROM aircraft_states ORDER BY airport_icao
   `);
 
   const airports: string[] = [];
-  for (let i = 0; i < reader.currentRowCount; i++) {
-    airports.push(reader.value(i, 0) as string);
+  while (true) {
+    const chunk = await result.fetchChunk();
+    if (chunk.rowCount === 0) break;
+    const rows = chunk.getRows();
+    for (const row of rows) {
+      airports.push(row[0] as string);
+    }
   }
   return airports;
 }

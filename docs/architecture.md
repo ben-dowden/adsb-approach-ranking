@@ -110,28 +110,49 @@ This document describes the module structure and data flow for the ADS-B Arrival
 
 ---
 
-### 4. Sequence Scoring
+### 4. Sequence Scoring (Ranking Engine)
 
-**Purpose**: Identify cohorts, compute ranks, and score sequences.
+**Purpose**: Identify cohorts, compute ranks, and track rank trajectories.
 
-**Input**: `ring_events` Parquet
+**CLI**: `pnpm pipeline:score --airport YBBN --date 2025-12-01`
+
+**Input**: `ring_events` from derive stage
 
 **Output**:
-- Enriched `ring_events` with rank columns
-- `sequences` Parquet (see [data-contracts.md](data-contracts.md))
+- `arrival_ranks` table/Parquet with detailed rank trajectories
+- Enriched `ring_events` with rank columns updated
+
+**Module Structure** (`packages/pipeline/src/rank/`):
+```
+rank/
+├── types.ts       # ArrivalRank, CohortMember, constants
+├── db.ts          # Database operations (DuckDB)
+├── cohort.ts      # Cohort grouping by ring + time bucket
+├── compute.ts     # Dense rank computation (distance, TTG)
+├── trajectory.ts  # Delta computation across rings
+└── index.ts       # Barrel export
+```
 
 **Responsibilities**:
 
 **Cohort Identification**:
-- Group aircraft crossing the same ring within a time window
-- Window size configurable (e.g., 10 minutes)
+- Group ring_events by (ring_nm, time_bucket)
+- Default bucket size: 5 minutes (300 seconds)
+- Minimum cohort size: 2 aircraft
 
 **Rank Computation**:
-- `rank_distance`: order by distance to aerodrome (ascending)
-- `rank_ttg`: order by estimated time-to-go (distance / |closing_rate|)
+- `rank_distance`: dense rank by distance_nm ascending
+- `rank_ttg`: dense rank by estimated time-to-go (distance / |closing_rate|)
+- Deterministic tie-breaker: ICAO hex alphabetically
+- TTG uses epsilon (0.001) to avoid division by zero
 
-**Sequence Scoring**:
-- Track rank changes across rings for each aircraft
+**Trajectory Tracking**:
+- Order crossings by ring descending (outer→inner)
+- Compute deltas: `delta_rank = current_rank - previous_rank`
+- First ring (outermost) has null deltas
+- Assign `ring_order_index`: 0, 1, 2... (progression through rings)
+
+**Sequence Scoring** (future):
 - `score_rank_vol`: sum of absolute rank changes
 - `score_inversions`: count of pairwise order swaps between rings
 
@@ -187,8 +208,8 @@ This document describes the module structure and data flow for the ADS-B Arrival
 |-------|-------|--------|---------|
 | Ingest | Source archives | Raw states | `raw/` |
 | Normalize | Raw states | `aircraft_states` | `processed/aircraft_states/` |
-| Derive | `aircraft_states` | `ring_events` | `processed/ring_events/` |
-| Sequence Scoring | `ring_events` | `ring_events` (enriched), `sequences` | `processed/sequences/` |
+| Derive | `aircraft_states` | `ring_events` | `processed/{date}/ring_events.parquet` |
+| Score (Ranking) | `ring_events` | `arrival_ranks`, enriched `ring_events` | `processed/{date}/arrival_ranks.parquet` |
 | API | All processed | JSON responses | (runtime) |
 | Dashboard | API | Visual | (browser) |
 

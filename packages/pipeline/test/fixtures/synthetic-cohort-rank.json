@@ -1,0 +1,45 @@
+{
+  "description": "Synthetic cohort of 5 aircraft at 20nm ring with varying distances and speeds for rank testing",
+  "members": [
+    {
+      "arrivalId": "arr-alpha",
+      "icaoHex": "7CAAAA",
+      "ringNm": 20,
+      "crossTsUtc": "2025-12-01T10:00:00Z",
+      "distanceNm": 20.5,
+      "closingRate": -4.0
+    },
+    {
+      "arrivalId": "arr-bravo",
+      "icaoHex": "7CBBBB",
+      "ringNm": 20,
+      "crossTsUtc": "2025-12-01T10:00:10Z",
+      "distanceNm": 19.2,
+      "closingRate": -3.5
+    },
+    {
+      "arrivalId": "arr-charlie",
+      "icaoHex": "7CCCCC",
+      "ringNm": 20,
+      "crossTsUtc": "2025-12-01T10:00:20Z",
+      "distanceNm": 21.8,
+      "closingRate": -5.0
+    },
+    {
+      "arrivalId": "arr-delta",
+      "icaoHex": "7CDDDD",
+      "ringNm": 20,
+      "crossTsUtc": "2025-12-01T10:00:30Z",
+      "distanceNm": 18.0,
+      "closingRate": -2.5
+    },
+    {
+      "arrivalId": "arr-echo",
+      "icaoHex": "7CEEEE",
+      "ringNm": 20,
+      "crossTsUtc": "2025-12-01T10:00:40Z",
+      "distanceNm": 22.3,
+      "closingRate": -6.0
+    }
+  ]
+}
