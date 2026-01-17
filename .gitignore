@@ -26,9 +26,13 @@ coverage/
 
 # Data (large files)
 data/raw/
+data/db/
 data/processed/
 *.parquet
 *.duckdb
+
+# TypeScript build info
+*.tsbuildinfo
 
 # Logs
 *.log

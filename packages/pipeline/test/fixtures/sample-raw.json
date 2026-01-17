@@ -1,0 +1,41 @@
+{
+  "now": 1733011200.0,
+  "aircraft": [
+    {
+      "hex": "7c1234",
+      "lat": -27.4,
+      "lon": 153.1,
+      "alt_baro": 3000,
+      "gs": 150,
+      "track": 180,
+      "flight": "QFA123 ",
+      "baro_rate": -500
+    },
+    {
+      "hex": "7c5678",
+      "lat": -27.5,
+      "lon": 153.2,
+      "alt_baro": "ground",
+      "gs": 0,
+      "track": 90,
+      "flight": "  VH-ABC  "
+    },
+    {
+      "hex": "7c9999",
+      "lat": -28.5,
+      "lon": 154.0,
+      "alt_baro": 35000,
+      "gs": 450
+    },
+    {
+      "hex": "7cabcd"
+    },
+    {
+      "hex": "7c0000",
+      "lat": -27.38,
+      "lon": 153.12,
+      "gs": 120,
+      "geom_rate": -400
+    }
+  ]
+}

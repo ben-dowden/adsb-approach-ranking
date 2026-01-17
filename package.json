@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pipeline:ingest": "pnpm --filter @adsb/pipeline ingest",
+    "pipeline:normalize": "pnpm --filter @adsb/pipeline normalize",
     "pipeline:derive": "pnpm --filter @adsb/pipeline derive",
     "pipeline:score": "pnpm --filter @adsb/pipeline score",
     "dashboard:dev": "pnpm --filter @adsb/dashboard dev",

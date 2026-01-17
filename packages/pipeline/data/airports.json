@@ -1,0 +1,14 @@
+[
+  { "icao": "YBBN", "lat": -27.3842, "lon": 153.1175, "name": "Brisbane Airport" },
+  { "icao": "EGLL", "lat": 51.4700, "lon": -0.4543, "name": "London Heathrow" },
+  { "icao": "YSSY", "lat": -33.9399, "lon": 151.1753, "name": "Sydney Airport" },
+  { "icao": "YMML", "lat": -37.6690, "lon": 144.8410, "name": "Melbourne Airport" },
+  { "icao": "KLAX", "lat": 33.9425, "lon": -118.4081, "name": "Los Angeles International" },
+  { "icao": "KJFK", "lat": 40.6413, "lon": -73.7781, "name": "John F. Kennedy International" },
+  { "icao": "EHAM", "lat": 52.3086, "lon": 4.7639, "name": "Amsterdam Schiphol" },
+  { "icao": "LFPG", "lat": 49.0097, "lon": 2.5479, "name": "Paris Charles de Gaulle" },
+  { "icao": "EDDF", "lat": 50.0379, "lon": 8.5622, "name": "Frankfurt Airport" },
+  { "icao": "VHHH", "lat": 22.3080, "lon": 113.9185, "name": "Hong Kong International" },
+  { "icao": "WSSS", "lat": 1.3644, "lon": 103.9915, "name": "Singapore Changi" },
+  { "icao": "RJTT", "lat": 35.5494, "lon": 139.7798, "name": "Tokyo Haneda" }
+]
