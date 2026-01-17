@@ -12,6 +12,7 @@
     "score": "node --import tsx src/scripts/score.ts",
     "sequence": "node --import tsx src/scripts/sequence.ts",
     "normalize": "node --import tsx src/scripts/normalize.ts",
+    "analyze": "node --import tsx src/scripts/analyze.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
