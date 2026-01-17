@@ -225,18 +225,55 @@ sequence/
 
 **Purpose**: Visual replay and inspection of sequences.
 
+**Tech Stack**: Next.js 15, Leaflet, react-leaflet, SWR, Recharts
+
+**Pages**:
+
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/sequences` | SequencesPage | List sequences by date/airport |
+| `/sequence/[id]` | ReplayView | Interactive map replay |
+
+**Replay View Layout**:
+```
+┌────────────────────────────────┬─────────────────┐
+│                                │                 │
+│           Map (70%)            │  Arrival Panel  │
+│    - Aircraft markers          │    (30%)        │
+│    - Distance rings            │  - Sorted list  │
+│    - Airport marker            │  - Rank badges  │
+│                                │  - Selection    │
+├────────────────────────────────┴─────────────────┤
+│              Time Scrubber                       │
+│  [▶] ──────────────────────── [1x][2x][5x]       │
+└──────────────────────────────────────────────────┘
+```
+
 **Features**:
-- Map view with aircraft positions
-- Timeline scrubber for replay
-- Rank visualization (bar chart or table showing relative positions)
+- Map view with aircraft positions and rotation
+- Concentric distance rings (50/40/30/25/20/15/10/8/6/4 nm)
+- Timeline scrubber with 5-second steps
+- Playback speed control (1x, 2x, 5x)
+- Rank visualization via color (green→yellow→red)
+- Rank change indicators (pulse animation, ↑/↓ arrows)
 - Sequence list sorted by churn score
-- Filter by date, traffic density, score threshold
+- Filter by date and airport
 
 **Interactions**:
-- Click sequence → load replay
-- Play/pause/step through time
-- Highlight specific aircraft
-- Show kinematic data (speed, closing rate, altitude)
+- Click sequence row → load replay
+- Click aircraft marker or panel row → select/highlight
+- Drag timeline → seek to timestamp
+- Play/pause button → auto-advance
+
+**Key Components**:
+- `ReplayView.tsx` - Main orchestrator
+- `ApproachMap.tsx` - Leaflet map container
+- `AircraftMarker.tsx` - Rotated marker with rank color
+- `RingOverlay.tsx` - Concentric distance circles
+- `TimeScrubber.tsx` - Playback controls
+- `ArrivalPanel.tsx` - Side panel with arrival list
+- `SequenceTable.tsx` - Sortable sequence list
+- `DateFilter.tsx` - Date/airport selector
 
 ---
 

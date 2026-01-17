@@ -85,6 +85,8 @@ The goal is **clarity**, not performance.
 
 - [Architecture](docs/architecture.md) — Module design and data flow
 - [Data Contracts](docs/data-contracts.md) — Schema definitions
+- [Dashboard Quickstart](docs/dashboard-quickstart.md) — Running the replay UI
+- [Development Setup](docs/DEV.md) — Local development guide
 
 ## License
 
