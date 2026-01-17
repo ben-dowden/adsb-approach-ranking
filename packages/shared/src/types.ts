@@ -21,13 +21,18 @@ export interface AircraftState {
 /** Ring crossing event */
 export interface RingEvent {
   arrivalId: string;
+  airportIcao: string;
   icao: string;
   callsign: string | null;
   ringNm: number;
   crossTs: Date;
-  gs: number | null;
-  closingRate: number;
+  lat: number;
+  lon: number;
   altBaro: number | null;
+  gs: number | null;
+  track: number | null;
+  closingRate: number;
+  distanceNm: number;
   rankDistance: number | null;
   rankTtg: number | null;
   trafficCount: number;
@@ -58,7 +63,7 @@ export interface PipelineConfig {
 }
 
 /** Default ring distances in nautical miles */
-export const DEFAULT_RING_DISTANCES = [20, 15, 10, 5] as const;
+export const DEFAULT_RING_DISTANCES = [50, 40, 30, 25, 20, 15, 10, 8, 6, 4] as const;
 
 /** Default cohort time window in seconds */
 export const DEFAULT_COHORT_WINDOW_SEC = 600;

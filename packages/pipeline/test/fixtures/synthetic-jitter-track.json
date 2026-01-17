@@ -1,0 +1,15 @@
+{
+  "description": "Synthetic track that oscillates around the 20 NM ring boundary (should only trigger one crossing)",
+  "icao": "7C5678",
+  "callsign": "VOZ456",
+  "states": [
+    { "ts": "2025-12-01T11:00:00.000Z", "lat": -27.0, "lon": 153.3, "altBaro": 8000, "gs": 250, "track": 270, "distanceNm": 25 },
+    { "ts": "2025-12-01T11:00:10.000Z", "lat": -27.05, "lon": 153.25, "altBaro": 7900, "gs": 248, "track": 270, "distanceNm": 22 },
+    { "ts": "2025-12-01T11:00:20.000Z", "lat": -27.1, "lon": 153.2, "altBaro": 7800, "gs": 246, "track": 270, "distanceNm": 19 },
+    { "ts": "2025-12-01T11:00:30.000Z", "lat": -27.08, "lon": 153.22, "altBaro": 7850, "gs": 248, "track": 90, "distanceNm": 21 },
+    { "ts": "2025-12-01T11:00:40.000Z", "lat": -27.12, "lon": 153.18, "altBaro": 7750, "gs": 245, "track": 270, "distanceNm": 18 },
+    { "ts": "2025-12-01T11:00:50.000Z", "lat": -27.1, "lon": 153.2, "altBaro": 7800, "gs": 247, "track": 90, "distanceNm": 20.5 },
+    { "ts": "2025-12-01T11:01:00.000Z", "lat": -27.15, "lon": 153.15, "altBaro": 7700, "gs": 243, "track": 270, "distanceNm": 17 },
+    { "ts": "2025-12-01T11:01:10.000Z", "lat": -27.2, "lon": 153.1, "altBaro": 7600, "gs": 240, "track": 270, "distanceNm": 14 }
+  ]
+}

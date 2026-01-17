@@ -1,0 +1,18 @@
+{
+  "description": "Synthetic track that crosses all rings monotonically (50, 40, 30, 25, 20, 15, 10, 8, 6, 4 NM) with 10-second intervals",
+  "icao": "7C1234",
+  "callsign": "QFA123",
+  "states": [
+    { "ts": "2025-12-01T10:00:00.000Z", "lat": -27.0, "lon": 153.5, "altBaro": 10000, "gs": 280, "track": 270, "distanceNm": 55 },
+    { "ts": "2025-12-01T10:00:10.000Z", "lat": -27.1, "lon": 153.4, "altBaro": 9500, "gs": 275, "track": 270, "distanceNm": 48 },
+    { "ts": "2025-12-01T10:00:20.000Z", "lat": -27.2, "lon": 153.3, "altBaro": 9000, "gs": 270, "track": 270, "distanceNm": 38 },
+    { "ts": "2025-12-01T10:00:30.000Z", "lat": -27.3, "lon": 153.2, "altBaro": 8500, "gs": 265, "track": 270, "distanceNm": 28 },
+    { "ts": "2025-12-01T10:00:40.000Z", "lat": -27.35, "lon": 153.15, "altBaro": 8000, "gs": 260, "track": 270, "distanceNm": 23 },
+    { "ts": "2025-12-01T10:00:50.000Z", "lat": -27.4, "lon": 153.1, "altBaro": 7500, "gs": 250, "track": 270, "distanceNm": 18 },
+    { "ts": "2025-12-01T10:01:00.000Z", "lat": -27.45, "lon": 153.05, "altBaro": 7000, "gs": 240, "track": 270, "distanceNm": 13 },
+    { "ts": "2025-12-01T10:01:10.000Z", "lat": -27.48, "lon": 153.02, "altBaro": 6500, "gs": 230, "track": 270, "distanceNm": 9 },
+    { "ts": "2025-12-01T10:01:20.000Z", "lat": -27.49, "lon": 153.01, "altBaro": 6000, "gs": 220, "track": 270, "distanceNm": 7 },
+    { "ts": "2025-12-01T10:01:30.000Z", "lat": -27.495, "lon": 153.005, "altBaro": 5500, "gs": 200, "track": 270, "distanceNm": 5 },
+    { "ts": "2025-12-01T10:01:40.000Z", "lat": -27.5, "lon": 153.0, "altBaro": 5000, "gs": 180, "track": 270, "distanceNm": 3 }
+  ]
+}
