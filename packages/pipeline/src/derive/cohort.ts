@@ -67,7 +67,7 @@ export async function precomputeTrafficCounts(
     // Use chunk-based iteration for reliable reading
     while (true) {
       const chunk = await result.fetchChunk();
-      if (chunk.rowCount === 0) break;
+      if (!chunk || chunk.rowCount === 0) break;
       const rows = chunk.getRows();
       for (const row of rows) {
         const tsBucket = Number(row[0]);

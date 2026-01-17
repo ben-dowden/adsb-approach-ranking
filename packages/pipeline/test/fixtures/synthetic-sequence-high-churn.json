@@ -1,0 +1,32 @@
+{
+  "description": "Synthetic arrivals with high rank churn - 3 aircraft that swap positions at inner rings for inversion testing",
+  "arrivals": [
+    {
+      "arrivalId": "arr-alpha",
+      "icaoHex": "7CAAAA",
+      "rings": [
+        { "ringNm": 30, "crossTsUtc": "2025-12-01T10:00:00Z", "rankDistance": 1, "deltaRankDistance": null, "cohortSize": 3 },
+        { "ringNm": 20, "crossTsUtc": "2025-12-01T10:05:00Z", "rankDistance": 2, "deltaRankDistance": 1, "cohortSize": 3 },
+        { "ringNm": 10, "crossTsUtc": "2025-12-01T10:10:00Z", "rankDistance": 3, "deltaRankDistance": 1, "cohortSize": 3 }
+      ]
+    },
+    {
+      "arrivalId": "arr-bravo",
+      "icaoHex": "7CBBBB",
+      "rings": [
+        { "ringNm": 30, "crossTsUtc": "2025-12-01T10:00:30Z", "rankDistance": 2, "deltaRankDistance": null, "cohortSize": 3 },
+        { "ringNm": 20, "crossTsUtc": "2025-12-01T10:05:30Z", "rankDistance": 1, "deltaRankDistance": -1, "cohortSize": 3 },
+        { "ringNm": 10, "crossTsUtc": "2025-12-01T10:10:30Z", "rankDistance": 2, "deltaRankDistance": 1, "cohortSize": 3 }
+      ]
+    },
+    {
+      "arrivalId": "arr-charlie",
+      "icaoHex": "7CCCCC",
+      "rings": [
+        { "ringNm": 30, "crossTsUtc": "2025-12-01T10:01:00Z", "rankDistance": 3, "deltaRankDistance": null, "cohortSize": 3 },
+        { "ringNm": 20, "crossTsUtc": "2025-12-01T10:06:00Z", "rankDistance": 3, "deltaRankDistance": 0, "cohortSize": 3 },
+        { "ringNm": 10, "crossTsUtc": "2025-12-01T10:11:00Z", "rankDistance": 1, "deltaRankDistance": -2, "cohortSize": 3 }
+      ]
+    }
+  ]
+}

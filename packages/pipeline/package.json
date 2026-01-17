@@ -10,6 +10,7 @@
     "ingest": "node --import tsx src/scripts/ingest.ts",
     "derive": "node --import tsx src/scripts/derive.ts",
     "score": "node --import tsx src/scripts/score.ts",
+    "sequence": "node --import tsx src/scripts/sequence.ts",
     "normalize": "node --import tsx src/scripts/normalize.ts",
     "test": "vitest run",
     "test:watch": "vitest"

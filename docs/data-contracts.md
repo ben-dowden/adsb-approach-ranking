@@ -108,53 +108,67 @@ Detailed rank trajectory for each aircraft at each ring crossing.
 
 ---
 
-## sequences
+## arrival_sequences
 
-Scored arrival sequences showing rank evolution across rings.
+Rolling time windows scored for sequencing "interestingness" based on rank volatility, order inversions, and traffic density.
 
-**Path**: `processed/sequences/{airport_icao}/{date}/`
+**Path**: `processed/{date}/arrival_sequences.parquet`
 
 | Field | Type | Nullable | Description |
 |-------|------|----------|-------------|
-| `sequence_id` | string | No | Unique sequence identifier |
-| `airport_icao` | string | No | Target aerodrome |
-| `start_ts` | timestamp[us, UTC] | No | First ring crossing in sequence |
-| `end_ts` | timestamp[us, UTC] | No | Last ring crossing in sequence |
-| `duration_sec` | int32 | No | Sequence duration (seconds) |
-| `aircraft_count` | int16 | No | Number of aircraft in sequence |
-| `score_rank_vol` | float32 | No | Rank volatility score |
-| `score_inversions` | int32 | No | Count of pairwise order inversions |
-| `traffic_count` | int16 | No | Peak cohort size during sequence |
+| `sequence_id` | string | No | Unique sequence identifier (airport_epoch) |
+| `airport_icao` | string | No | Target aerodrome ICAO code |
+| `window_start_ts` | timestamp[us, UTC] | No | Window start time |
+| `window_end_ts` | timestamp[us, UTC] | No | Window end time |
+| `rank_volatility` | float32 | No | Sum of |delta_rank_distance| in window |
+| `inversion_count` | int32 | No | Count of pairwise rank inversions |
+| `avg_inner_density` | float32 | No | Avg cohort size for rings ≤15nm |
+| `sequence_score` | float32 | No | Combined z-score of all metrics |
+| `aircraft_count` | int16 | No | Number of unique aircraft in window |
+| `arrival_ids` | string | No | JSON array of arrival IDs in window |
 
 **Primary Key**: `sequence_id`
 
-**Partitioning**: By `airport_icao`, then by date
+### Metric Definitions
 
-### Score Definitions
-
-**`score_rank_vol`**: Sum of absolute rank changes for all aircraft across rings.
+**`rank_volatility`**: Sum of absolute rank changes within the window.
 
 ```
-score_rank_vol = Σ |rank[ring_n] - rank[ring_n-1]| for all aircraft, all ring transitions
+rank_volatility = Σ |delta_rank_distance| for all arrivals in window
 ```
 
-Higher values indicate more reordering during the approach.
+Higher values indicate more position changes during approach.
 
-**`score_inversions`**: Count of pairwise order swaps between consecutive rings.
+**`inversion_count`**: Pairwise order swaps between consecutive rings.
 
 ```
-For aircraft A and B in same cohort:
-  inversion if rank_A < rank_B at ring N, but rank_A > rank_B at ring N-1
+For aircraft A and B sharing rings:
+  inversion if (rank_A < rank_B at outer) && (rank_A > rank_B at inner)
 ```
 
 Higher values indicate more "overtaking" behaviour.
 
-### Sequence Identification
+**`avg_inner_density`**: Traffic density at close-in rings.
 
-A sequence is formed when:
-1. Two or more aircraft cross the outermost ring within a time window
-2. Those aircraft continue inbound and cross subsequent rings
-3. The sequence ends when all aircraft exit the innermost ring or data ends
+```
+avg_inner_density = AVG(cohort_size) for rings ≤ 15nm
+```
+
+Higher values indicate more congested final approach.
+
+**`sequence_score`**: Z-score normalized combination.
+
+```
+sequence_score = z(rank_volatility) + z(inversion_count) + z(avg_inner_density)
+```
+
+Windows with higher scores show unusual sequencing activity.
+
+### Window Parameters
+
+- Window size: 30 minutes (default)
+- Window step: 5 minutes (default)
+- Minimum aircraft: 3 unique arrivals per window
 
 ---
 
@@ -163,7 +177,7 @@ A sequence is formed when:
 ```
 aircraft_states ──[1:N]──▶ ring_events (via icao)
 ring_events ──[1:1]──▶ arrival_ranks (via arrival_id, ring_nm)
-ring_events ──[N:1]──▶ sequences (via sequence membership)
+arrival_ranks ──[N:1]──▶ arrival_sequences (via time window membership)
 ```
 
 ---

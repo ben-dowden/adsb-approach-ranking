@@ -32,7 +32,8 @@ packages/shared/    # Types and utilities
 | `pnpm dashboard:dev` | Start dashboard dev server |
 | `pnpm pipeline:ingest` | Load raw ADS-B data |
 | `pnpm pipeline:derive` | Compute ring crossings |
-| `pnpm pipeline:score` | Score sequences |
+| `pnpm pipeline:score` | Compute ranks and trajectories |
+| `pnpm pipeline:sequence` | Identify high-churn arrival windows |
 
 Or use `make dev`, `make test`, `make pipeline`.
 

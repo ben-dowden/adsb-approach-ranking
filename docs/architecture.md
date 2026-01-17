@@ -152,17 +152,55 @@ rank/
 - First ring (outermost) has null deltas
 - Assign `ring_order_index`: 0, 1, 2... (progression through rings)
 
-**Sequence Scoring** (future):
-- `score_rank_vol`: sum of absolute rank changes
-- `score_inversions`: count of pairwise order swaps between rings
+---
 
-**Sequence Definition**:
-- A sequence = set of aircraft that appear together in cohorts across multiple rings
-- Identified by overlapping cohort membership
+### 5. Sequence Windowing
+
+**Purpose**: Identify arrival windows where sequencing churn is unusually high.
+
+**CLI**: `pnpm pipeline:sequence --airport YBBN --date 2025-12-01`
+
+**Input**: `arrival_ranks` from score stage
+
+**Output**: `arrival_sequences` table/Parquet with window metrics and scores
+
+**Module Structure** (`packages/pipeline/src/sequence/`):
+```
+sequence/
+├── types.ts       # ArrivalSequence, WindowMetrics, constants
+├── db.ts          # Database operations (DuckDB)
+├── window.ts      # Rolling window generation
+├── metrics.ts     # Volatility, inversions, density computation
+├── score.ts       # Z-score normalization
+└── index.ts       # Barrel export
+```
+
+**Responsibilities**:
+
+**Rolling Window Generation**:
+- Window size: 30 minutes (default)
+- Window step: 5 minutes (default)
+- Minimum aircraft: 3 unique arrivals per window
+
+**Metric Computation**:
+- `rank_volatility`: Σ |delta_rank_distance| for all arrivals in window
+- `inversion_count`: pairwise order swaps between consecutive rings
+- `avg_inner_density`: average cohort size for rings ≤ 15nm
+
+**Sequence Scoring**:
+- Z-score normalize each metric across all windows for the day
+- Combined score: z(volatility) + z(inversions) + z(density)
+- Higher scores indicate more sequencing activity/churn
+
+**Inversion Algorithm**:
+1. Build trajectory map: arrivalId → Map<ringNm, rankDistance>
+2. For each pair of arrivals sharing 2+ rings
+3. Check consecutive rings (outer vs inner)
+4. Count flips: (rankA < rankB at outer) && (rankA > rankB at inner)
 
 ---
 
-### 5. API
+### 7. API
 
 **Purpose**: Serve processed data for downstream consumers.
 
@@ -183,7 +221,7 @@ rank/
 
 ---
 
-### 6. Dashboard
+### 8. Dashboard
 
 **Purpose**: Visual replay and inspection of sequences.
 
@@ -210,6 +248,7 @@ rank/
 | Normalize | Raw states | `aircraft_states` | `processed/aircraft_states/` |
 | Derive | `aircraft_states` | `ring_events` | `processed/{date}/ring_events.parquet` |
 | Score (Ranking) | `ring_events` | `arrival_ranks`, enriched `ring_events` | `processed/{date}/arrival_ranks.parquet` |
+| Sequence | `arrival_ranks` | `arrival_sequences` | `processed/{date}/arrival_sequences.parquet` |
 | API | All processed | JSON responses | (runtime) |
 | Dashboard | API | Visual | (browser) |
 
