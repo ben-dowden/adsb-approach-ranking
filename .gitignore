@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Data (large files)
+data/raw/
+data/processed/
+*.parquet
+*.duckdb
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Lockfile (keep pnpm-lock.yaml)
+package-lock.json
+yarn.lock
