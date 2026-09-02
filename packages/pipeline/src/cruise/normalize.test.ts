@@ -53,10 +53,7 @@ describe("normalizeCruiseAircraft", () => {
     const ts = new Date("2025-12-01T01:00:00Z");
 
     expect(
-      normalizeCruiseAircraft(
-        { hex: "a", t: "B738", lat: -30, lon: 140 },
-        ts
-      )
+      normalizeCruiseAircraft({ hex: "a", t: "B738", lat: -30, lon: 140 }, ts)
     ).toBeNull();
     expect(
       normalizeCruiseAircraft(

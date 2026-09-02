@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.pnpm-store/
 
 # Build outputs
 dist/
@@ -28,6 +29,7 @@ coverage/
 data/raw/
 data/db/
 data/processed/
+data/analysis/
 *.parquet
 *.duckdb
 

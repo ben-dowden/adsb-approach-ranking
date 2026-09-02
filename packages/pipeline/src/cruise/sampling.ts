@@ -1,4 +1,5 @@
 import type { S3ObjectInfo } from "../s3/types.js";
+
 import type {
   CoverageCandidate,
   CoverageDiscovery,
@@ -56,7 +57,8 @@ export function sampledObjectsForDay(
     objects: sampledObjects,
     expectedCount: expected.length,
     complete:
-      sampledObjects.length === expected.length && missingTimestamps.length === 0,
+      sampledObjects.length === expected.length &&
+      missingTimestamps.length === 0,
     missingTimestamps,
   };
 }
@@ -111,7 +113,10 @@ export async function discoverCompleteDays(options: {
     candidates.push(
       coverageCandidate(date, discoveredObjects, options.intervalMinutes)
     );
-    if (candidates.filter((candidate) => candidate.complete).length >= options.requiredDays) {
+    if (
+      candidates.filter((candidate) => candidate.complete).length >=
+      options.requiredDays
+    ) {
       break;
     }
   }

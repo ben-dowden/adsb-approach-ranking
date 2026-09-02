@@ -1,6 +1,7 @@
 import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { buildOutputTables, writeOutputTables } from "./outputs.js";
@@ -50,9 +51,8 @@ describe("buildOutputTables", () => {
   });
 
   it("adds an ALL_MATCHED_ROUTES roll-up for each registration", () => {
-    const rows = buildOutputTables(fixtureBundle())[
-      "aircraft_route_summary.csv"
-    ]!;
+    const rows =
+      buildOutputTables(fixtureBundle())["aircraft_route_summary.csv"]!;
 
     expect(
       rows.some((row) => row.directional_route === "ALL_MATCHED_ROUTES")
@@ -70,6 +70,21 @@ describe("writeOutputTables", () => {
       expect(await readFile(executivePath, "utf8")).toContain(
         "adjusted_difference_ft"
       );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("writes headers for empty audit tables", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "cruise-outputs-"));
+    try {
+      await writeOutputTables(directory, {
+        ...buildOutputTables(fixtureBundle()),
+        "flight_cruise_metrics.csv": [],
+      });
+      expect(
+        await readFile(join(directory, "flight_cruise_metrics.csv"), "utf8")
+      ).toContain("analysis_run_id,flight_id,sample_date_utc");
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

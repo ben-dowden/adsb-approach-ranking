@@ -1,4 +1,5 @@
 import type { RawAircraft } from "../normalize/types.js";
+
 import {
   AUSTRALIAN_ANALYSIS_ENVELOPE,
   B737_TYPES,
@@ -11,7 +12,10 @@ function normalizedText(value: string | undefined): string | null {
   return normalized || null;
 }
 
-function isInsideAnalysisEnvelope(latitude: number, longitude: number): boolean {
+function isInsideAnalysisEnvelope(
+  latitude: number,
+  longitude: number
+): boolean {
   return (
     latitude >= AUSTRALIAN_ANALYSIS_ENVELOPE.minimumLatitude &&
     latitude <= AUSTRALIAN_ANALYSIS_ENVELOPE.maximumLatitude &&

@@ -1,15 +1,112 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { join } from "node:path";
-import Papa from "papaparse";
 
-import type {
-  AnalysisBundle,
-  FlightCruiseMetric,
-} from "./types.js";
+import type * as PapaParse from "papaparse";
+
+import type { AnalysisBundle, FlightCruiseMetric } from "./types.js";
 
 type OutputValue = string | number | boolean | null;
 type OutputRow = Record<string, OutputValue>;
 export type OutputTables = Record<string, OutputRow[]>;
+
+const { unparse } = createRequire(import.meta.url)(
+  "papaparse"
+) as typeof PapaParse;
+
+const OUTPUT_FIELDS: Readonly<Record<string, string[]>> = {
+  "flight_cruise_metrics.csv": [
+    "analysis_run_id",
+    "flight_id",
+    "sample_date_utc",
+    "registration",
+    "icao_hex",
+    "aircraft_type",
+    "operator_code",
+    "operator_name",
+    "callsign",
+    "directional_route",
+    "origin_icao",
+    "destination_icao",
+    "origin_evidence_ts_utc",
+    "destination_evidence_ts_utc",
+    "mean_cruise_altitude_ft",
+    "median_cruise_altitude_ft",
+    "minimum_cruise_altitude_ft",
+    "maximum_cruise_altitude_ft",
+    "standard_deviation_ft",
+    "cruise_observation_count",
+    "observed_cruise_minutes",
+  ],
+  "aircraft_route_summary.csv": [
+    "analysis_run_id",
+    "registration",
+    "icao_hex",
+    "operator_code",
+    "operator_name",
+    "aircraft_types",
+    "directional_route",
+    "qualifying_flight_count",
+    "matched_route_count",
+    "mean_cruise_altitude_ft",
+    "median_cruise_altitude_ft",
+    "minimum_cruise_altitude_ft",
+    "maximum_cruise_altitude_ft",
+    "standard_deviation_ft",
+    "thin_sample_flag",
+  ],
+  "route_operator_summary.csv": [
+    "analysis_run_id",
+    "directional_route",
+    "operator_code",
+    "operator_name",
+    "qualifying_flight_count",
+    "aircraft_count",
+    "sample_date_count",
+    "aircraft_types",
+    "mean_cruise_altitude_ft",
+    "median_cruise_altitude_ft",
+    "minimum_cruise_altitude_ft",
+    "maximum_cruise_altitude_ft",
+    "matched_route_eligible",
+  ],
+  "route_matched_comparison.csv": [
+    "analysis_run_id",
+    "directional_route",
+    "qantas_mean_cruise_altitude_ft",
+    "virgin_mean_cruise_altitude_ft",
+    "virgin_minus_qantas_ft",
+    "confidence_interval_low_ft",
+    "confidence_interval_high_ft",
+    "qantas_flight_count",
+    "virgin_flight_count",
+    "qantas_aircraft_count",
+    "virgin_aircraft_count",
+    "represented_date_count",
+  ],
+  "executive_summary.csv": [
+    "analysis_run_id",
+    "verdict",
+    "adjusted_difference_ft",
+    "confidence_interval_low_ft",
+    "confidence_interval_high_ft",
+    "unadjusted_difference_ft",
+    "sensitivity_virgin_coefficient_ft",
+    "matched_route_count",
+    "represented_date_count",
+    "qantas_flight_count",
+    "virgin_flight_count",
+    "qantas_aircraft_count",
+    "virgin_aircraft_count",
+  ],
+  "data_quality.csv": [
+    "analysis_run_id",
+    "stage",
+    "reason",
+    "count",
+    "percentage",
+  ],
+};
 
 function rounded(value: number | null, digits = 2): number | null {
   if (value === null) return null;
@@ -155,12 +252,10 @@ function routeOperatorRows(bundle: AnalysisBundle): OutputRow[] {
         operator_code: first.operatorCode,
         operator_name: first.operatorName,
         qualifying_flight_count: flights.length,
-        aircraft_count: new Set(
-          flights.map((flight) => flight.registration)
-        ).size,
-        sample_date_count: new Set(
-          flights.map((flight) => flight.sampleDate)
-        ).size,
+        aircraft_count: new Set(flights.map((flight) => flight.registration))
+          .size,
+        sample_date_count: new Set(flights.map((flight) => flight.sampleDate))
+          .size,
         aircraft_types: [
           ...new Set(flights.map((flight) => flight.aircraftType)),
         ]
@@ -268,6 +363,12 @@ export async function writeOutputTables(
 ): Promise<void> {
   await mkdir(outputDirectory, { recursive: true });
   for (const [name, rows] of Object.entries(tables)) {
-    await writeFile(join(outputDirectory, name), `${Papa.unparse(rows)}\n`, "utf8");
+    const fields = OUTPUT_FIELDS[name];
+    if (!fields) throw new Error(`Unknown output table: ${name}`);
+    await writeFile(
+      join(outputDirectory, name),
+      `${unparse({ fields, data: rows })}\n`,
+      "utf8"
+    );
   }
 }

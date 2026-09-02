@@ -3,6 +3,7 @@
   { "icao": "EGLL", "lat": 51.4700, "lon": -0.4543, "name": "London Heathrow" },
   { "icao": "YSSY", "lat": -33.9399, "lon": 151.1753, "name": "Sydney Airport" },
   { "icao": "YMML", "lat": -37.6690, "lon": 144.8410, "name": "Melbourne Airport" },
+  { "icao": "YPPH", "lat": -31.9403, "lon": 115.9672, "name": "Perth Airport" },
   { "icao": "KLAX", "lat": 33.9425, "lon": -118.4081, "name": "Los Angeles International" },
   { "icao": "KJFK", "lat": 40.6413, "lon": -73.7781, "name": "John F. Kennedy International" },
   { "icao": "EHAM", "lat": 52.3086, "lon": 4.7639, "name": "Amsterdam Schiphol" },

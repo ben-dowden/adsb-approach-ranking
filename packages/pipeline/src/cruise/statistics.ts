@@ -206,12 +206,18 @@ function solveLinearSystem(
   for (let column = 0; column < augmented.length; column++) {
     let pivotRow = column;
     for (let row = column + 1; row < augmented.length; row++) {
-      if (Math.abs(augmented[row]![column]!) > Math.abs(augmented[pivotRow]![column]!)) {
+      if (
+        Math.abs(augmented[row]![column]!) >
+        Math.abs(augmented[pivotRow]![column]!)
+      ) {
         pivotRow = row;
       }
     }
     if (Math.abs(augmented[pivotRow]![column]!) < 1e-9) return null;
-    [augmented[column], augmented[pivotRow]] = [augmented[pivotRow]!, augmented[column]!];
+    [augmented[column], augmented[pivotRow]] = [
+      augmented[pivotRow]!,
+      augmented[column]!,
+    ];
     const pivot = augmented[column]![column]!;
     augmented[column] = augmented[column]!.map((value) => value / pivot);
     for (let row = 0; row < augmented.length; row++) {
@@ -232,7 +238,10 @@ export function fixedEffectVirginCoefficient(
     (flight) => flight.operatorCode === "QFA" || flight.operatorCode === "VOZ"
   );
   if (comparisonFlights.length === 0) return null;
-  const routeColumns = dummyColumns(comparisonFlights, (flight) => flight.route);
+  const routeColumns = dummyColumns(
+    comparisonFlights,
+    (flight) => flight.route
+  );
   const dateColumns = dummyColumns(
     comparisonFlights,
     (flight) => flight.sampleDate
@@ -254,10 +263,7 @@ export function fixedEffectVirginCoefficient(
   const columnCount = design[0]!.length;
   const crossProduct = Array.from({ length: columnCount }, (_, row) =>
     Array.from({ length: columnCount }, (_, column) =>
-      design.reduce(
-        (sum, values) => sum + values[row]! * values[column]!,
-        0
-      )
+      design.reduce((sum, values) => sum + values[row]! * values[column]!, 0)
     )
   );
   const crossOutcome = Array.from({ length: columnCount }, (_, column) =>
@@ -287,8 +293,12 @@ export function analyzeMatchedRoutes(
   const distributions = bootstrap(routes, options.replicates, options.seed);
   const nationalInterval = confidenceInterval(distributions.national);
   const matchedFlights = allMatchedFlights(routes);
-  const qantas = matchedFlights.filter((flight) => flight.operatorCode === "QFA");
-  const virgin = matchedFlights.filter((flight) => flight.operatorCode === "VOZ");
+  const qantas = matchedFlights.filter(
+    (flight) => flight.operatorCode === "QFA"
+  );
+  const virgin = matchedFlights.filter(
+    (flight) => flight.operatorCode === "VOZ"
+  );
 
   return {
     executive: {

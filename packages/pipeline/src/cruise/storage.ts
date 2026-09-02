@@ -1,3 +1,6 @@
+import { mkdir } from "node:fs/promises";
+import { dirname } from "node:path";
+
 import {
   DuckDBInstance,
   timestampValue,
@@ -5,8 +8,6 @@ import {
   type DuckDBPreparedStatement,
   type DuckDBTimestampValue,
 } from "@duckdb/node-api";
-import { mkdir } from "node:fs/promises";
-import { dirname } from "node:path";
 
 import type { CruiseState } from "./types.js";
 
@@ -152,12 +153,12 @@ export async function readCruiseStates(
     const result = await connection.run(
       "SELECT * FROM cruise_states ORDER BY ts, icao_hex"
     );
-    while (true) {
-      const chunk = await result.fetchChunk();
-      if (!chunk || chunk.rowCount === 0) break;
+    let chunk = await result.fetchChunk();
+    while (chunk && chunk.rowCount > 0) {
       for (const row of chunk.getRows()) {
         states.push(cruiseStateFromRow(row));
       }
+      chunk = await result.fetchChunk();
     }
   } finally {
     connection.closeSync();

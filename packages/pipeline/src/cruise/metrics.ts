@@ -130,11 +130,7 @@ export function buildFlightCruiseMetric(
   const firstState = [...states].sort(
     (left, right) => left.ts.getTime() - right.ts.getTime()
   )[0];
-  if (
-    !firstState ||
-    !firstState.callsign ||
-    !firstState.operatorCode
-  ) {
+  if (!firstState || !firstState.callsign || !firstState.operatorCode) {
     return null;
   }
   const summary = calculateFlightCruiseMetrics(states);

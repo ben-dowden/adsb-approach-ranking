@@ -1,13 +1,7 @@
 import { haversineDistanceNm } from "@adsb/shared";
 
-import {
-  ANALYSIS_AIRPORTS,
-  DEFAULT_CRUISE_CONFIG,
-} from "./constants.js";
-import type {
-  CruiseState,
-  RouteInferenceResult,
-} from "./types.js";
+import { ANALYSIS_AIRPORTS, DEFAULT_CRUISE_CONFIG } from "./constants.js";
+import type { CruiseState, RouteInferenceResult } from "./types.js";
 
 interface AirportEvidence {
   icao: string;
@@ -38,7 +32,11 @@ export function buildTrackSegments(states: CruiseState[]): CruiseState[][] {
   for (const currentState of orderedStates) {
     const currentSegment = segments.at(-1);
     const previousState = currentSegment?.at(-1);
-    if (!currentSegment || !previousState || startsNewSegment(previousState, currentState)) {
+    if (
+      !currentSegment ||
+      !previousState ||
+      startsNewSegment(previousState, currentState)
+    ) {
       segments.push([currentState]);
     } else {
       currentSegment.push(currentState);
@@ -86,13 +84,15 @@ function hasCruiseEvidenceBetween(
   originIndex: number,
   destinationIndex: number
 ): boolean {
-  const cruiseStates = states.slice(originIndex + 1, destinationIndex).filter(
-    (state) =>
-      state.altitudeFt !== null &&
-      state.altitudeFt >= DEFAULT_CRUISE_CONFIG.cruiseMinAltitudeFt &&
-      state.groundSpeedKt !== null &&
-      state.groundSpeedKt >= DEFAULT_CRUISE_CONFIG.cruiseMinGroundSpeedKt
-  );
+  const cruiseStates = states
+    .slice(originIndex + 1, destinationIndex)
+    .filter(
+      (state) =>
+        state.altitudeFt !== null &&
+        state.altitudeFt >= DEFAULT_CRUISE_CONFIG.cruiseMinAltitudeFt &&
+        state.groundSpeedKt !== null &&
+        state.groundSpeedKt >= DEFAULT_CRUISE_CONFIG.cruiseMinGroundSpeedKt
+    );
   return cruiseStates.length >= DEFAULT_CRUISE_CONFIG.minimumCruiseObservations;
 }
 
@@ -101,7 +101,8 @@ function movedAwayFromOrigin(
   evidence: AirportEvidence,
   destinationIndex: number
 ): boolean {
-  const airport = ANALYSIS_AIRPORTS[evidence.icao as keyof typeof ANALYSIS_AIRPORTS];
+  const airport =
+    ANALYSIS_AIRPORTS[evidence.icao as keyof typeof ANALYSIS_AIRPORTS];
   return states
     .slice(evidence.stateIndex + 1, destinationIndex)
     .some(
@@ -116,7 +117,8 @@ function movedTowardDestination(
   originIndex: number,
   evidence: AirportEvidence
 ): boolean {
-  const airport = ANALYSIS_AIRPORTS[evidence.icao as keyof typeof ANALYSIS_AIRPORTS];
+  const airport =
+    ANALYSIS_AIRPORTS[evidence.icao as keyof typeof ANALYSIS_AIRPORTS];
   return states
     .slice(originIndex + 1, evidence.stateIndex)
     .some(
@@ -145,7 +147,10 @@ export function inferDirectionalRoute(
   if (originIndex < 0 || destinationIndex < 0) {
     return { included: false, reason: "truncated_track" };
   }
-  if (evidence[originIndex]!.length !== 1 || evidence[destinationIndex]!.length !== 1) {
+  if (
+    evidence[originIndex]!.length !== 1 ||
+    evidence[destinationIndex]!.length !== 1
+  ) {
     return { included: false, reason: "ambiguous_endpoint" };
   }
 

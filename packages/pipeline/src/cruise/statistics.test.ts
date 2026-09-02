@@ -79,7 +79,9 @@ describe("analyzeMatchedRoutes", () => {
         fixtureFlights("YBBN-YSSY", "2025-01-01", "QFA", 35_000, 5),
         { minimumFlights: 5, replicates: 100, seed: 737 }
       )
-    ).toThrow("No directional route meets the Qantas and Virgin flight threshold");
+    ).toThrow(
+      "No directional route meets the Qantas and Virgin flight threshold"
+    );
   });
 });
 

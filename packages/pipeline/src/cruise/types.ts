@@ -99,10 +99,7 @@ export interface MatchedRouteResult {
   representedDateCount: number;
 }
 
-export type BenchmarkVerdict =
-  | "supports"
-  | "does_not_support"
-  | "inconclusive";
+export type BenchmarkVerdict = "supports" | "does_not_support" | "inconclusive";
 
 export interface ExecutiveResult {
   verdict: BenchmarkVerdict;

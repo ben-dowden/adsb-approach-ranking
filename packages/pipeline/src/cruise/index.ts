@@ -1,4 +1,5 @@
 export * from "./constants.js";
+export * from "./benchmark.js";
 export * from "./flights.js";
 export * from "./metrics.js";
 export * from "./normalize.js";

@@ -13,6 +13,7 @@
     "sequence": "node --import tsx src/scripts/sequence.ts",
     "normalize": "node --import tsx src/scripts/normalize.ts",
     "analyze": "node --import tsx src/scripts/analyze.ts",
+    "cruise": "node --import tsx src/scripts/cruise.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
