@@ -30,6 +30,7 @@ data/raw/
 data/db/
 data/processed/
 data/analysis/
+packages/pipeline/data/analysis/
 *.parquet
 *.duckdb
 
