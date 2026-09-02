@@ -5,6 +5,8 @@
 /** Raw aircraft data from readsb JSON files */
 export interface RawAircraft {
   hex: string;
+  r?: string;
+  t?: string;
   lat?: number;
   lon?: number;
   alt_baro?: number | "ground";

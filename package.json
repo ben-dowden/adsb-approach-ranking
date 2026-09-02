@@ -15,6 +15,7 @@
     "pipeline:normalize": "pnpm --filter @adsb/pipeline normalize",
     "pipeline:derive": "pnpm --filter @adsb/pipeline derive",
     "pipeline:score": "pnpm --filter @adsb/pipeline score",
+    "pipeline:cruise": "pnpm --filter @adsb/pipeline cruise",
     "dashboard:dev": "pnpm --filter @adsb/dashboard dev",
     "dashboard:build": "pnpm --filter @adsb/dashboard build"
   },
